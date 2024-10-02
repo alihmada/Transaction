@@ -20,16 +20,16 @@ import com.ali.transaction.Interfaces.ViewOnClickListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PersonsAdapter extends RecyclerView.Adapter<PersonsAdapter.ViewHolder> implements Filterable {
-    static List<Customer> filteredPersons;
+public class CustomersAdapter extends RecyclerView.Adapter<CustomersAdapter.ViewHolder> implements Filterable {
+    static List<Customer> filteredCustomers;
     private final ViewOnClickListener viewOnClickListener;
-    private final List<Customer> persons;
+    private final List<Customer> Customers;
 
 
-    public PersonsAdapter(List<Customer> persons, ViewOnClickListener viewOnClickListener) {
+    public CustomersAdapter(List<Customer> customers, ViewOnClickListener viewOnClickListener) {
         this.viewOnClickListener = viewOnClickListener;
-        filteredPersons = new ArrayList<>(persons);
-        this.persons = persons;
+        filteredCustomers = new ArrayList<>(customers);
+        this.Customers = customers;
     }
 
     @NonNull
@@ -42,15 +42,15 @@ public class PersonsAdapter extends RecyclerView.Adapter<PersonsAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        holder.character.setText(String.valueOf(filteredPersons.get(position).getName().charAt(0)));
-        holder.name.setText(filteredPersons.get(position).getName());
+        holder.character.setText(String.valueOf(filteredCustomers.get(position).getName().charAt(0)));
+        holder.name.setText(filteredCustomers.get(position).getName());
 
         Animation.startAnimation(holder.itemView);
     }
 
     @Override
     public int getItemCount() {
-        return filteredPersons.size();
+        return filteredCustomers.size();
     }
 
     @Override
@@ -62,7 +62,7 @@ public class PersonsAdapter extends RecyclerView.Adapter<PersonsAdapter.ViewHold
 
                 List<Customer> filteredList = new ArrayList<>();
 
-                for (Customer person : persons) {
+                for (Customer person : Customers) {
                     if (person.getName().toLowerCase().contains(query)) {
                         filteredList.add(person);
                     }
@@ -83,14 +83,14 @@ public class PersonsAdapter extends RecyclerView.Adapter<PersonsAdapter.ViewHold
                         List<Customer> filteredList = (List<Customer>) resultList;
 
                         // Calculate the differences between the previous and new filtered lists
-                        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(filteredPersons, filteredList));
+                        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(filteredCustomers, filteredList));
 
                         // Update the filtered customers list
-                        filteredPersons.clear();
-                        filteredPersons.addAll(filteredList);
+                        filteredCustomers.clear();
+                        filteredCustomers.addAll(filteredList);
 
                         // Dispatch the specific change events to the adapter
-                        diffResult.dispatchUpdatesTo(PersonsAdapter.this);
+                        diffResult.dispatchUpdatesTo(CustomersAdapter.this);
                     }
                 }
             }
@@ -107,7 +107,7 @@ public class PersonsAdapter extends RecyclerView.Adapter<PersonsAdapter.ViewHold
             character = itemView.findViewById(R.id.character);
             name = itemView.findViewById(R.id.name);
 
-            itemView.setOnClickListener(v -> viewOnClickListener.onClickListener(filteredPersons.get(getBindingAdapterPosition()).getId()));
+            itemView.setOnClickListener(v -> viewOnClickListener.onClickListener(filteredCustomers.get(getBindingAdapterPosition()).getId()));
         }
     }
 }

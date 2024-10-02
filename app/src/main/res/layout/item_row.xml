@@ -13,6 +13,7 @@
         android:layout_marginEnd="@dimen/margin"
         android:background="@drawable/text_view_circle"
         android:backgroundTint="@color/account_filed"
+        android:contentDescription="@string/app_name"
         android:padding="@dimen/margin"
         android:src="@drawable/arrow_upward"
         app:layout_constraintEnd_toEndOf="parent"
@@ -20,12 +21,14 @@
 
     <TextView
         android:id="@+id/date"
+        style="@style/single_line"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin"
         android:layout_marginEnd="@dimen/margin"
         android:textSize="@dimen/secondary_text_size"
         app:layout_constraintEnd_toStartOf="@+id/type"
+        app:layout_constraintStart_toEndOf="@+id/balance"
         app:layout_constraintTop_toTopOf="@+id/type" />
 
     <TextView
@@ -33,10 +36,11 @@
         style="@style/single_line"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@+id/type"
         app:layout_constraintEnd_toEndOf="@+id/date"
-        app:layout_constraintStart_toStartOf="@+id/date"
+        app:layout_constraintStart_toEndOf="@+id/balance"
         app:layout_constraintTop_toBottomOf="@+id/date" />
 
     <TextView

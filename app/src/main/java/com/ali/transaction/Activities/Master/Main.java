@@ -17,7 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.ali.transaction.Adapters.PersonsAdapter;
+import com.ali.transaction.Adapters.CustomersAdapter;
 import com.ali.transaction.Classes.Common;
 import com.ali.transaction.Classes.FirstItemMarginDecoration;
 import com.ali.transaction.Classes.Internet;
@@ -38,7 +38,7 @@ public class Main extends AppCompatActivity implements ViewOnClickListener {
     private Bundle bundle;
     private EditText search;
     private List<Customer> persons;
-    private PersonsAdapter adapter;
+    private CustomersAdapter adapter;
     private CustomersViewModel model;
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
@@ -168,7 +168,7 @@ public class Main extends AppCompatActivity implements ViewOnClickListener {
 
     private void setupRecyclerViewData(List<Customer> persons) {
         this.persons = persons;
-        adapter = new PersonsAdapter(persons, this);
+        adapter = new CustomersAdapter(persons, this);
         recyclerView.setAdapter(adapter);
     }
 

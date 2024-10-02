@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -49,7 +48,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
         holder.reason.setText(filteredItems.get(position).getReason());
         holder.date.setText(DateAndTime.getDate(holder.itemView.getContext(), filteredItems.get(position).getDate()));
-        holder.balance.setText(String.format("%s ج.م",Calculation.formatNumberWithCommas(filteredItems.get(position).getBalance())));
+        holder.balance.setText(String.format("%s ج.م", Calculation.formatNumberWithCommas(filteredItems.get(position).getBalance())));
         if (filteredItems.get(position).getType() == Item.Type.TAKE) {
             holder.imageView.setImageResource(R.drawable.arrow_downward);
             holder.balance.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.green));
@@ -76,7 +75,8 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
                 for (Item item : items) {
                     if (item.getReason().toLowerCase().contains(query)
-                            || String.valueOf(item.getBalance()).toLowerCase().contains(query)) {
+                            || String.valueOf(item.getBalance()).toLowerCase().contains(query)
+                            || item.getDate().toLowerCase().contains(query)) {
                         filteredList.add(item);
                     }
                 }
