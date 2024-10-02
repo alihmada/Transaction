@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+
+    <color name="Periwinkle">#BCC9FC</color>
+    <color name="Vista_Blue">#89A0FA</color>
+
+    <color name="sonic_silver">#7A7A7A</color>
+
+    <color name="red">#FF2424</color>  <!-- F97775 -->
+    <color name="green">#50C917</color>
+
+
+    <color name="Magnolia">#FEF7FF</color>
+    <color name="Night">#141218</color>
+</resources>

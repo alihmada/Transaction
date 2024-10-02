@@ -1,0 +1,52 @@
+<resources>
+    <string name="app_name">معاملاتى</string>
+
+    <string name="tracking">متابعة</string>
+    <string name="phone_hint">01 xxx xxx xxxx</string>
+
+    <string name="otp">رمز التحقق</string>
+    <string name="verification_code">رمز التحقق</string>
+    <string name="verification_text">لقد أرسلنا اليك رمز التحقق</string>
+
+    <string name="first_name">الإسم الأول</string>
+    <string name="last_name">الإسم الأخير</string>
+    <string name="id">الرقم التعريفى</string>
+
+    <string name="login">تسجيل الدخول</string>
+    <string name="mobile">رقم الهاتف</string>
+    <string name="invalid_phone_no">قم بادخال رقم هاتف صحيح</string>
+    <string name="invalid_country_code">من فضلك قم بإختيار كود بلد صحيح</string>
+
+    <string name="loading">جارى التحميل…</string>
+    <string name="error_in_inputs">من فضلك راجع البيانات المدخلة</string>
+    <string name="search">البحث</string>
+    <string name="customers">العملاء</string>
+    <string name="data_not_found">لا توجد بيانات للعرض</string>
+
+    <!-- internet -->
+    <string name="no_internet">خطأ فى الإتصال بالإنترنت</string>
+    <string name="internet_limited">سرعة الإتصال محدودة</string>
+    <string name="full_name">ادخل اسم العميل</string>
+    <string name="complete_registration">إتمام التسجيل</string>
+
+    <string name="reason">السبب</string>
+    <string name="day">يوم</string>
+    <string name="hour">الساعة</string>
+    <string name="delete_operation">هل أنت متأكد من إتمام عملية الحذف؟</string>
+    <string name="today">النهارده</string>
+    <string name="yesterday">إمبارح</string>
+    <string name="main_page">الصفحة الرئيسية</string>
+    <string name="take">أخذت</string>
+    <string name="give">أعطيت</string>
+    <string name="balance">الرصيد</string>
+    <string name="transactions">المعاملات</string>
+    <string name="price">المبلغ</string>
+    <string name="more_info">المزيد من التفاصيل</string>
+
+    <string name="ok">نعم</string>
+    <string name="cancel">لا</string>
+    <string name="exit">هل تريد الخروج؟</string>
+    <string name="profile_info">الملف الشخصي</string>
+    <string name="name_of_customer">إسم المستخدم</string>
+
+</resources>

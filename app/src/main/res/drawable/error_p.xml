@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/red_stroke_with_2dp_width" android:state_focused="true" />
+
+    <item android:drawable="@drawable/red_stroke_with_1dp_width" android:state_focused="false" />
+</selector>
