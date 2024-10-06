@@ -4,20 +4,20 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.ali.transaction.Models.Item;
+import com.ali.transaction.Models.JobItem;
 
 public class SelectedItemViewModel extends ViewModel {
-    private MutableLiveData<Item> mutableLiveData;
+    private MutableLiveData<JobItem> mutableLiveData;
 
-    public void initialize(String parentID, String childID) {
+    public void initialize(String clientID, String jobID, String itemID) {
         if (mutableLiveData != null) {
             return;
         }
         Repository repository = Repository.getInstance();
-        mutableLiveData = repository.getItem(parentID, childID);
+        mutableLiveData = repository.getItem(clientID, jobID, itemID);
     }
 
-    public LiveData<Item> getItem() {
+    public LiveData<JobItem> getItem() {
         return mutableLiveData;
     }
 }

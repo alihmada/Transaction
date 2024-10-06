@@ -13,44 +13,44 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ali.transaction.Classes.Animation;
 import com.ali.transaction.Classes.DiffCallback;
-import com.ali.transaction.Models.Customer;
+import com.ali.transaction.Models.Client;
 import com.ali.transaction.R;
 import com.ali.transaction.Interfaces.ViewOnClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomersAdapter extends RecyclerView.Adapter<CustomersAdapter.ViewHolder> implements Filterable {
-    static List<Customer> filteredCustomers;
+public class ClientsAdapter extends RecyclerView.Adapter<ClientsAdapter.ViewHolder> implements Filterable {
+    static List<Client> filteredClients;
     private final ViewOnClickListener viewOnClickListener;
-    private final List<Customer> Customers;
+    private final List<Client> clients;
 
 
-    public CustomersAdapter(List<Customer> customers, ViewOnClickListener viewOnClickListener) {
+    public ClientsAdapter(List<Client> clients, ViewOnClickListener viewOnClickListener) {
         this.viewOnClickListener = viewOnClickListener;
-        filteredCustomers = new ArrayList<>(customers);
-        this.Customers = customers;
+        filteredClients = new ArrayList<>(clients);
+        this.clients = clients;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.person_row, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.client_row, parent, false);
         return new ViewHolder(view, viewOnClickListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        holder.character.setText(String.valueOf(filteredCustomers.get(position).getName().charAt(0)));
-        holder.name.setText(filteredCustomers.get(position).getName());
+        holder.character.setText(filteredClients.get(position).getName().substring(0, 1));
+        holder.name.setText(filteredClients.get(position).getName());
 
         Animation.startAnimation(holder.itemView);
     }
 
     @Override
     public int getItemCount() {
-        return filteredCustomers.size();
+        return filteredClients.size();
     }
 
     @Override
@@ -60,11 +60,11 @@ public class CustomersAdapter extends RecyclerView.Adapter<CustomersAdapter.View
             protected FilterResults performFiltering(CharSequence constraint) {
                 String query = constraint.toString().toLowerCase();
 
-                List<Customer> filteredList = new ArrayList<>();
+                List<Client> filteredList = new ArrayList<>();
 
-                for (Customer person : Customers) {
-                    if (person.getName().toLowerCase().contains(query)) {
-                        filteredList.add(person);
+                for (Client client : clients) {
+                    if (client.getName().toLowerCase().contains(query)) {
+                        filteredList.add(client);
                     }
                 }
 
@@ -78,19 +78,19 @@ public class CustomersAdapter extends RecyclerView.Adapter<CustomersAdapter.View
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 if (results.values instanceof List) {
                     List<?> resultList = (List<?>) results.values;
-                    if (!resultList.isEmpty() && resultList.get(0) instanceof Customer) {
+                    if (!resultList.isEmpty() && resultList.get(0) instanceof Client) {
                         @SuppressWarnings("unchecked")
-                        List<Customer> filteredList = (List<Customer>) resultList;
+                        List<Client> filteredList = (List<Client>) resultList;
 
                         // Calculate the differences between the previous and new filtered lists
-                        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(filteredCustomers, filteredList));
+                        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(filteredClients, filteredList));
 
-                        // Update the filtered customers list
-                        filteredCustomers.clear();
-                        filteredCustomers.addAll(filteredList);
+                        // Update the filtered clients list
+                        filteredClients.clear();
+                        filteredClients.addAll(filteredList);
 
                         // Dispatch the specific change events to the adapter
-                        diffResult.dispatchUpdatesTo(CustomersAdapter.this);
+                        diffResult.dispatchUpdatesTo(ClientsAdapter.this);
                     }
                 }
             }
@@ -107,7 +107,7 @@ public class CustomersAdapter extends RecyclerView.Adapter<CustomersAdapter.View
             character = itemView.findViewById(R.id.character);
             name = itemView.findViewById(R.id.name);
 
-            itemView.setOnClickListener(v -> viewOnClickListener.onClickListener(filteredCustomers.get(getBindingAdapterPosition()).getId()));
+            itemView.setOnClickListener(v -> viewOnClickListener.onClickListener(filteredClients.get(getBindingAdapterPosition()).getId()));
         }
     }
 }

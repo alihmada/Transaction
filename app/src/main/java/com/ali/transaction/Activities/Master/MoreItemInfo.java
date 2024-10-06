@@ -13,16 +13,16 @@ import com.ali.transaction.Database.Firebase;
 import com.ali.transaction.Dialogs.Confirmation;
 import com.ali.transaction.Dialogs.ValueDialog;
 import com.ali.transaction.MVVM.SelectedItemViewModel;
-import com.ali.transaction.Models.Item;
+import com.ali.transaction.Models.JobItem;
 import com.ali.transaction.R;
 
 import java.util.Objects;
 
 public class MoreItemInfo extends AppCompatActivity {
 
-    private Item item;
+    private JobItem item;
     private SelectedItemViewModel model;
-    private String parentID, childID;
+    private String clientID, jobID, itemID;
     private TextView date, label, reason, balance;
 
     @Override
@@ -42,8 +42,9 @@ public class MoreItemInfo extends AppCompatActivity {
     }
 
     private void getExtras() {
-        parentID = Objects.requireNonNull(getIntent().getExtras()).getString(Common.PARENT_ID);
-        childID = Objects.requireNonNull(getIntent().getExtras()).getString(Common.ITEM_ID);
+        clientID = Objects.requireNonNull(getIntent().getExtras()).getString(Common.CLIENT_ID);
+        jobID = Objects.requireNonNull(getIntent().getExtras()).getString(Common.JOB_ID);
+        itemID = Objects.requireNonNull(getIntent().getExtras()).getString(Common.ITEM_ID);
     }
 
     private void setupTextView() {
@@ -63,9 +64,9 @@ public class MoreItemInfo extends AppCompatActivity {
                 ValueDialog.InputType.DECIMAL,
                 Common.DECIMAL_REGEX,
                 text -> {
-                    item.setDate(DateAndTime.getCurrentDateTime());
+//                    item.setDate(DateAndTime.getCurrentDateTime());
                     item.setBalance(Double.parseDouble(text));
-                    Firebase.editItem(parentID, childID, item);
+                    Firebase.editItem(clientID, jobID, itemID, item);
                 }
         ));
 
@@ -74,16 +75,16 @@ public class MoreItemInfo extends AppCompatActivity {
                 ValueDialog.InputType.TEXT,
                 "",
                 text -> {
-                    item.setDate(DateAndTime.getCurrentDateTime());
+//                    item.setDate(DateAndTime.getCurrentDateTime());
                     item.setReason(text);
-                    Firebase.editItem(parentID, childID, item);
+                    Firebase.editItem(clientID, jobID, itemID, item);
                 }
         ));
     }
 
     private void handleDeleteButton() {
         Confirmation confirmation = new Confirmation(R.drawable.wrong, getString(R.string.delete_operation), () -> {
-            Firebase.deleteItem(parentID, childID);
+            Firebase.deleteItem(clientID, jobID, itemID);
             finish();
         });
         confirmation.show(getSupportFragmentManager(), "");
@@ -96,7 +97,7 @@ public class MoreItemInfo extends AppCompatActivity {
 
     private void setupViewModel() {
         model = new ViewModelProvider(this).get(SelectedItemViewModel.class);
-        model.initialize(parentID, childID);
+        model.initialize(clientID, jobID, itemID);
     }
 
     private void setupViewsData() {
@@ -105,9 +106,9 @@ public class MoreItemInfo extends AppCompatActivity {
                 this.item = item;
 
                 date.setText(DateAndTime.getDate(this, item.getDate()));
-                label.setText(item.getType() == Item.Type.TAKE ? getString(R.string.take) : getString(R.string.give));
+                label.setText(item.getType() == JobItem.Type.TAKE ? getString(R.string.take) : getString(R.string.give));
                 balance.setText(String.format("%s ج.م", Calculation.formatNumberWithCommas(item.getBalance())));
-                balance.setTextColor(item.getType() == Item.Type.TAKE ? getColor(R.color.green) : getColor(R.color.red));
+                balance.setTextColor(item.getType() == JobItem.Type.TAKE ? getColor(R.color.green) : getColor(R.color.red));
                 reason.setText(item.getReason());
             }
         });

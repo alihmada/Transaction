@@ -7,7 +7,7 @@ import android.util.TypedValue;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.ali.transaction.Activities.Master.Main;
+import com.ali.transaction.Activities.Master.Clients;
 import com.ali.transaction.R;
 
 public class Splash extends AppCompatActivity {
@@ -39,7 +39,7 @@ public class Splash extends AppCompatActivity {
     }
 
     private void redirectToMainScreen() {
-        Intent intent = new Intent(this, Main.class);
+        Intent intent = new Intent(this, Clients.class);
         startActivity(intent);
         finish();
     }

@@ -13,18 +13,21 @@ public class Common {
     public static final String DECIMAL_REGEX = "\\d*\\.?\\d+$";
     public static final String NOT_EMPTY_REGEX = "^\\s*\\S.*$";
 
+    public static final String JOBS = "Jobs";
+    public static final String JOB_ITEMS = "Items";
+
     public static final String ID = "id";
+    public static final String CLIENT_ID = "client id";
+    public static final String JOB_ID = "job id";
+    public static final String ITEM_ID = "item id";
+
+    public static final String NAME = "name";
     public static final String TAKE = "take";
     public static final String GIVE = "give";
-    public static final String PARENT_ID = "parent";
-    public static final String ITEM_ID = "child";
-    public static final String NAME = "name";
+
     public static final String MESSAGE = "message";
 
-    private static final String ROOT = "My Transactions";
-
-    public static String getROOT() {
-        return ROOT;
+    public static String getRoot() {
+        return "Clients";
     }
-
 }

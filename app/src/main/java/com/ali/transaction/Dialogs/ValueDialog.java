@@ -38,7 +38,7 @@ public class ValueDialog extends BottomSheetDialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.add_person_dialog, container, false);
+        View view = inflater.inflate(R.layout.add_client_dialog, container, false);
         initialize(view);
         return view;
     }

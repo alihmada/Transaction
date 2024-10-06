@@ -1,22 +1,16 @@
 package com.ali.transaction.MVVM;
 
-import android.util.Log;
 import android.util.Pair;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
-import com.ali.transaction.Classes.Common;
 import com.ali.transaction.Database.Firebase;
-import com.ali.transaction.Models.Customer;
-import com.ali.transaction.Models.Item;
-import com.google.firebase.database.DataSnapshot;
+import com.ali.transaction.Models.Client;
+import com.ali.transaction.Models.ClientJobModel;
+import com.ali.transaction.Models.JobItem;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Repository {
@@ -28,50 +22,30 @@ public class Repository {
         return instance;
     }
 
-    public MutableLiveData<List<Customer>> getCustomers() {
-        MutableLiveData<List<Customer>> mutableLiveData = new MutableLiveData<>();
+    public MutableLiveData<List<Client>> getClients() {
+        MutableLiveData<List<Client>> mutableLiveData = new MutableLiveData<>();
 
-        // Query to get the list of Persons from Firebase
-        Firebase.getPersons().addValueEventListener(new ValueEventListener() {
+        Firebase.getAllClients(new Firebase.ClientsCallback() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                List<Customer> persons = new ArrayList<>();
-
-                // Check if data exists
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        try {
-                            Customer person = snapshot.getValue(Customer.class);
-                            if (person != null) {
-                                persons.add(person);
-                            }
-                        } catch (Exception e) {
-                            // Log error if there is an issue parsing the Customer object
-                            Log.e("FirebaseError", "Error parsing Customer", e);
-                        }
-                    }
-                }
-
-                // Even if no data, return an empty list instead of null
-                mutableLiveData.setValue(persons);
+            public void onClientFetched(List<Client> clients) {
+                mutableLiveData.setValue(clients);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Log the database error
-                Log.e("FirebaseError", "Firebase operation cancelled: " + databaseError.getMessage());
+            public void onError(DatabaseError error) {
+                mutableLiveData.setValue(null);
             }
         });
 
         return mutableLiveData;
     }
 
-    public MutableLiveData<Customer> getCustomer(String id) {
-        MutableLiveData<Customer> mutableLiveData = new MutableLiveData<>();
-        fetchCustomerById(id, new CustomerCallback() {
+    public MutableLiveData<Client> getClient(String clientID) {
+        MutableLiveData<Client> mutableLiveData = new MutableLiveData<>();
+        Firebase.getClientById(clientID, new Firebase.ClientCallback() {
             @Override
-            public void onCustomerFetched(DatabaseReference reference, Customer customer) {
-                mutableLiveData.setValue(customer);
+            public void onClientFetched(DatabaseReference reference, Client Client) {
+                mutableLiveData.setValue(Client);
             }
 
             @Override
@@ -82,133 +56,73 @@ public class Repository {
         return mutableLiveData;
     }
 
-    private void fetchCustomerById(String id, CustomerCallback callback) {
-        Query personQuery = Firebase.getPersons().orderByChild(Common.ID).equalTo(id);
-        personQuery.addValueEventListener(new ValueEventListener() {
+    public MutableLiveData<ClientJobModel> getJob(String clientID, String jobID) {
+        MutableLiveData<ClientJobModel> mutableLiveData = new MutableLiveData<>();
+        Firebase.getJob(clientID, jobID, new Firebase.JobCallback() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
-                    Customer customer = dataSnapshot.getChildren().iterator().next().getValue(Customer.class);
-                    callback.onCustomerFetched(personQuery.getRef(), customer);
-                } else {
-                    callback.onCustomerFetched(null, null);  // Customer not found
-                }
+            public void onJobFetched(ClientJobModel jobModel) {
+                mutableLiveData.setValue(jobModel);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                callback.onError(databaseError);  // Handle error case
-            }
-        });
-    }
-
-    public MutableLiveData<Pair<Customer, List<Item>>> getCustomersWithItems(String id) {
-        MutableLiveData<Pair<Customer, List<Item>>> mutableLiveData = new MutableLiveData<>();
-
-        // Query to fetch the Customer data by ID
-        Query personQuery = Firebase.getPersons().orderByChild(Common.ID).equalTo(id);
-        personQuery.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // Check if data exists and is valid
-                if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
-                    DataSnapshot personSnapshot = dataSnapshot.getChildren().iterator().next();
-                    Customer person = personSnapshot.getValue(Customer.class);
-
-                    if (person != null) {
-                        // After retrieving Customer, query for the associated items
-                        fetchPersonItems(personSnapshot.getRef(), person, mutableLiveData);
-                    } else {
-                        mutableLiveData.setValue(null);  // Handle null person case
-                    }
-                } else {
-                    mutableLiveData.setValue(null);  // No data found
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                mutableLiveData.setValue(null);  // Handle error case
+            public void onFailure() {
+                mutableLiveData.setValue(null);
             }
         });
 
         return mutableLiveData;
     }
 
-    private void fetchPersonItems(DatabaseReference personRef, Customer person, MutableLiveData<Pair<Customer, List<Item>>> mutableLiveData) {
-        // Query to fetch the items associated with the person
-        personRef.child(Common.DATABASE_NAME).addListenerForSingleValueEvent(new ValueEventListener() {
+    public MutableLiveData<Pair<Client, List<ClientJobModel>>> getClientsWithJobs(String id) {
+        MutableLiveData<Pair<Client, List<ClientJobModel>>> mutableLiveData = new MutableLiveData<>();
+
+        Firebase.getClientWithJobs(id, new Firebase.ClientJobsCallback() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot itemSnapshot) {
-                List<Item> items = new ArrayList<>();
-
-                // Retrieve all items associated with the person
-                for (DataSnapshot snapshot : itemSnapshot.getChildren()) {
-                    Item item = snapshot.getValue(Item.class);
-                    if (item != null) {
-                        items.add(item);
-                    }
-                }
-
-                // Set the Pair<Customer, List<Item>> value to LiveData
-                mutableLiveData.setValue(new Pair<>(person, items));
+            public void onClientFetched(Pair<Client, List<ClientJobModel>> clientJobs) {
+                mutableLiveData.setValue(clientJobs);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                mutableLiveData.setValue(null);  // Handle error case
+            public void onError(DatabaseError error) {
+                mutableLiveData.setValue(null);
             }
         });
+        return mutableLiveData;
     }
 
-    public MutableLiveData<Item> getItem(String parentID, String childID) {
-        MutableLiveData<Item> mutableLiveData = new MutableLiveData<>();
+    public MutableLiveData<Pair<ClientJobModel, List<JobItem>>> getJobWithItems(String clientID, String jobID) {
+        MutableLiveData<Pair<ClientJobModel, List<JobItem>>> mutableLiveData = new MutableLiveData<>();
 
-        Query personQuery = Firebase.getPersons().orderByChild(Common.ID).equalTo(parentID);
-        personQuery.addValueEventListener(new ValueEventListener() {
+        Firebase.getJobWithItems(clientID, jobID, new Firebase.JobAndItemsCallback() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // Check if data exists and is valid
-                if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
-                    DataSnapshot personSnapshot = dataSnapshot.getChildren().iterator().next();
-
-                    // After retrieving Customer, query for the associated items
-                    personSnapshot.getRef().child(Common.DATABASE_NAME).orderByChild(Common.ID).equalTo(childID)
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot itemSnapshot) {
-                                    Item item = null;
-
-                                    if (itemSnapshot.exists() && itemSnapshot.getChildrenCount() > 0) {
-                                        // Get the first matching person and update the specified field
-                                        item = itemSnapshot.getChildren().iterator().next().getValue(Item.class);
-                                    }
-
-                                    mutableLiveData.setValue(item);
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                    mutableLiveData.setValue(null);  // Handle error case
-                                }
-                            });
-                } else {
-                    mutableLiveData.setValue(null);  // Handle null person case
-                }
+            public void onSuccess(Pair<ClientJobModel, List<JobItem>> pair) {
+                mutableLiveData.setValue(pair);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                mutableLiveData.setValue(null);  // Handle error case
+            public void onFailure(Pair<ClientJobModel, List<JobItem>> pair) {
+                mutableLiveData.setValue(pair);
             }
         });
 
         return mutableLiveData;
     }
 
-    interface CustomerCallback {
-        void onCustomerFetched(DatabaseReference reference, Customer customer);
+    public MutableLiveData<JobItem> getItem(String clientID, String jobID, String itemID) {
+        MutableLiveData<JobItem> mutableLiveData = new MutableLiveData<>();
 
-        void onError(DatabaseError error);
+        Firebase.getItem(clientID, jobID, itemID, new Firebase.ItemCallback() {
+            @Override
+            public void onItemFetched(JobItem jobItem) {
+                mutableLiveData.setValue(jobItem);
+            }
+
+            @Override
+            public void onFailure(String error) {
+                mutableLiveData.setValue(null);
+            }
+        });
+
+        return mutableLiveData;
     }
 }

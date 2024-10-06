@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Pair;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -17,29 +18,33 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.ali.transaction.Adapters.CustomersAdapter;
+import com.ali.transaction.Adapters.JobsAdapter;
+import com.ali.transaction.Classes.Calculation;
 import com.ali.transaction.Classes.Common;
 import com.ali.transaction.Classes.FirstItemMarginDecoration;
 import com.ali.transaction.Classes.Internet;
-import com.ali.transaction.Classes.UniqueIdGenerator;
 import com.ali.transaction.Database.Firebase;
-import com.ali.transaction.Dialogs.Confirmation;
 import com.ali.transaction.Dialogs.ValueDialog;
 import com.ali.transaction.Interfaces.ViewOnClickListener;
-import com.ali.transaction.MVVM.CustomersViewModel;
-import com.ali.transaction.Models.Customer;
+import com.ali.transaction.MVVM.ClientWithJobsViewModel;
+import com.ali.transaction.Models.Client;
+import com.ali.transaction.Models.ClientJobModel;
 import com.ali.transaction.R;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
-public class Main extends AppCompatActivity implements ViewOnClickListener {
+public class ClientJob extends AppCompatActivity implements ViewOnClickListener {
 
+    private String clientID;
     private Bundle bundle;
     private EditText search;
-    private List<Customer> persons;
-    private CustomersAdapter adapter;
-    private CustomersViewModel model;
+    private List<ClientJobModel> clientJobs;
+    private JobsAdapter adapter;
+    private ClientWithJobsViewModel model;
+    private TextView name, take, give, balance, active;
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
@@ -50,10 +55,12 @@ public class Main extends AppCompatActivity implements ViewOnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_client_job);
 
+        getExtra();
         initializeViews();
         initializeButtons();
+        setupHeader();
         setupSearch();
         setupSwipeRefreshLayout();
         setupViewModel();
@@ -62,36 +69,47 @@ public class Main extends AppCompatActivity implements ViewOnClickListener {
 
     private void initializeViews() {
         bundle = new Bundle();
+        clientJobs = new ArrayList<>();
+
+        name = findViewById(R.id.name);
+        take = findViewById(R.id.take);
+        give = findViewById(R.id.give);
+        balance = findViewById(R.id.balance);
+        active = findViewById(R.id.active);
 
         alert = findViewById(R.id.alert);
         imageView = findViewById(R.id.alert_image);
         textView = findViewById(R.id.alert_text);
         progressBar = findViewById(R.id.progressBar);
-        recyclerView = findViewById(R.id.person_recycler);
+        recyclerView = findViewById(R.id.jobs_recycler);
         recyclerView.addItemDecoration(new FirstItemMarginDecoration(getResources().getDimensionPixelSize(R.dimen.margin)));
     }
 
+    private void getExtra() {
+        clientID = Objects.requireNonNull(getIntent().getExtras()).getString(Common.CLIENT_ID);
+    }
+
     private void initializeButtons() {
-        findViewById(R.id.back).setOnClickListener(view -> {
-            Confirmation confirmation = new Confirmation(R.drawable.logout, getString(R.string.exit), this::finish);
-            confirmation.show(getSupportFragmentManager(), "");
-        });
+        findViewById(R.id.back).setOnClickListener(view -> finish());
         findViewById(R.id.filter).setOnClickListener(view -> {
-            if (persons != null) {
-                Collections.reverse(persons);
-                setupRecyclerViewData(persons);
+            if (clientJobs != null) {
+                Collections.reverse(clientJobs);
+                setupRecyclerViewData(clientJobs);
             }
         });
         findViewById(R.id.record).setOnClickListener(view -> {
-            ValueDialog dialog = new ValueDialog(R.string.full_name, ValueDialog.InputType.TEXT, Common.NOT_EMPTY_REGEX, (text) -> {
-                Customer person = new Customer(UniqueIdGenerator.generateUniqueId(),
-                        text,
-                        0,
-                        0);
-
-                Firebase.addPerson(person);
-            });
+            ValueDialog dialog = new ValueDialog(R.string.job_name, ValueDialog.InputType.TEXT, Common.NOT_EMPTY_REGEX,
+                    text -> Firebase.addJob(clientID, ClientJobModel.getInstance(text)));
             dialog.show(getSupportFragmentManager(), null);
+        });
+    }
+
+    private void setupHeader() {
+        findViewById(R.id.header).setOnClickListener(v -> {
+            Intent intent = new Intent(this, ClientProfile.class);
+            bundle.putString(Common.CLIENT_ID, clientID);
+            intent.putExtras(bundle);
+            startActivity(intent);
         });
     }
 
@@ -146,41 +164,65 @@ public class Main extends AppCompatActivity implements ViewOnClickListener {
     }
 
     private void setRecyclerView() {
-        model.getCustomers().observe(this, persons -> {
+        model.getClientsWithJobs().observe(this, data -> {
             progressBar.setVisibility(View.GONE);
 
-            if (persons == null || persons.isEmpty()) {
-                handleEmptyPersons();
+            this.clientJobs = data.second;
+            setupUserData(data.first);
+
+            if (data.second.isEmpty()) {
+                handleEmptyJobs();
             } else {
-                search.setEnabled(true);
-                setupRecyclerViewData(persons);
-                alert.setVisibility(View.GONE);
+                handleNonEmptyJobs();
             }
         });
     }
 
-    private void handleEmptyPersons() {
+    private void setupUserData(Client client) {
+        name.setText(client.getName());
+
+        give.setText(formatCurrency(client.getGive()));
+        take.setText(formatCurrency(client.getTake()));
+
+        Pair<String, Boolean> balance = Calculation.getBalance(client.getTake(), client.getGive());
+        this.balance.setText(String.format("%s ج.م", balance.first));
+        this.balance.setTextColor(balance.second ? getColor(R.color.green) : getColor(R.color.red));
+
+        active.setText(String.format("(%s ,نشط)", clientJobs.size()));
+    }
+
+    private void handleEmptyJobs() {
         search.setEnabled(false);
         recyclerView.setAdapter(null);
         alert.setVisibility(View.VISIBLE);
         textView.setText(getString(R.string.data_not_found));
     }
 
-    private void setupRecyclerViewData(List<Customer> persons) {
-        this.persons = persons;
-        adapter = new CustomersAdapter(persons, this);
+    private void handleNonEmptyJobs() {
+        search.setEnabled(true);
+        alert.setVisibility(View.GONE);
+        setupRecyclerViewData(clientJobs);
+    }
+
+    private void setupRecyclerViewData(List<ClientJobModel> clientJobs) {
+        adapter = new JobsAdapter(clientJobs, this);
         recyclerView.setAdapter(adapter);
     }
 
+    private String formatCurrency(double value) {
+        return String.format("%s ج.م", Calculation.formatNumberWithCommas(value));
+    }
+
     private void setupViewModel() {
-        model = new ViewModelProvider(this).get(CustomersViewModel.class);
-        model.initialize();
+        model = new ViewModelProvider(this).get(ClientWithJobsViewModel.class);
+        model.initialize(clientID);
     }
 
     @Override
     public void onClickListener(String id) {
-        Intent intent = new Intent(this, CustomerData.class);
-        bundle.putString(Common.ID, id);
+        Intent intent = new Intent(this, JobItems.class);
+        bundle.putString(Common.CLIENT_ID, this.clientID);
+        bundle.putString(Common.JOB_ID, id);
         intent.putExtras(bundle);
         startActivity(intent);
     }

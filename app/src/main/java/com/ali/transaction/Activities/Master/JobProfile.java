@@ -13,22 +13,22 @@ import com.ali.transaction.Classes.Common;
 import com.ali.transaction.Database.Firebase;
 import com.ali.transaction.Dialogs.Confirmation;
 import com.ali.transaction.Dialogs.ValueDialog;
-import com.ali.transaction.MVVM.CustomerViewModel;
+import com.ali.transaction.MVVM.JobViewModel;
 import com.ali.transaction.R;
 
 import java.util.Objects;
 
-public class CustomerProfile extends AppCompatActivity {
+public class JobProfile extends AppCompatActivity {
 
-    private CustomerViewModel model;
-    private ConstraintLayout editCustomerName;
-    private TextView character, name, take, give;
-    private String id;
+    private JobViewModel model;
+    private ConstraintLayout editJobName;
+    private TextView name, take, give;
+    private String clientID, jobID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_customer_profile);
+        setContentView(R.layout.activity_job_profile);
 
         getExtra();
         setupViewModel();
@@ -39,61 +39,61 @@ public class CustomerProfile extends AppCompatActivity {
     }
 
     private void getExtra() {
-        id = Objects.requireNonNull(getIntent().getExtras()).getString(Common.ID);
+        clientID = Objects.requireNonNull(getIntent().getExtras()).getString(Common.CLIENT_ID);
+        jobID = Objects.requireNonNull(getIntent().getExtras()).getString(Common.JOB_ID);
     }
 
     private void initializeViews() {
-        editCustomerName = findViewById(R.id.edit_name_of_customer);
+        editJobName = findViewById(R.id.edit_name_of_job);
 
-        character = findViewById(R.id.character);
-        name = findViewById(R.id.customer_name);
-        take = findViewById(R.id.customer_take);
-        give = findViewById(R.id.customer_give);
+        name = findViewById(R.id.job_name);
+        take = findViewById(R.id.job_take);
+        give = findViewById(R.id.job_give);
     }
 
     private void initializeButtons() {
         findViewById(R.id.back).setOnClickListener(view -> finish());
         findViewById(R.id.delete).setOnClickListener(view -> {
             Confirmation confirmation = new Confirmation(R.drawable.wrong, getString(R.string.delete_operation), () -> {
-                Firebase.deleteCustomer(id);
-                goToMainScreen();
+                Firebase.deleteJob(clientID, jobID);
+                goToJobsScreen();
             });
             confirmation.show(getSupportFragmentManager(), "");
         });
     }
 
-    private void goToMainScreen(){
-        Intent intent = new Intent(this, Main.class);
+    private void goToJobsScreen() {
+        Intent intent = new Intent(this, ClientJob.class);
+        intent.putExtra(Common.CLIENT_ID, this.clientID);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
     }
 
     private void setupListeners() {
-        editCustomerName.setOnClickListener(view -> {
+        editJobName.setOnClickListener(view -> {
             ValueDialog dialog = new ValueDialog(
-                    R.string.name_of_customer,
+                    R.string.job_name,
                     ValueDialog.InputType.TEXT,
                     Common.NOT_EMPTY_REGEX,
-                    text -> Firebase.updateCustomerName(id, text));
+                    text -> Firebase.updateJobName(clientID, jobID, text));
 
             dialog.show(getSupportFragmentManager(), null);
         });
     }
 
     private void setupViewModel() {
-        model = new ViewModelProvider(this).get(CustomerViewModel.class);
-        model.initialize(id);
+        model = new ViewModelProvider(this).get(JobViewModel.class);
+        model.initialize(clientID, jobID);
     }
 
     private void setTextViews() {
-        model.getCustomer().observe(this, customer -> {
-            if (customer != null) {
-                character.setText(customer.getName().substring(0, 1));
-                name.setText(customer.getName());
-                take.setText(String.format("%s ج.م", Calculation.formatNumberWithCommas(customer.getTake())));
+        model.getJob().observe(this, job -> {
+            if (job != null) {
+                name.setText(job.getName());
+                take.setText(String.format("%s ج.م", Calculation.formatNumberWithCommas(job.getTake())));
                 take.setTextColor(getColor(R.color.green));
-                give.setText(String.format("%s ج.م", Calculation.formatNumberWithCommas(customer.getGive())));
+                give.setText(String.format("%s ج.م", Calculation.formatNumberWithCommas(job.getGive())));
                 give.setTextColor(getColor(R.color.red));
             }
         });

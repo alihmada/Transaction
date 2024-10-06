@@ -1,19 +1,25 @@
 package com.ali.transaction.Models;
 
-public class Item {
+import com.ali.transaction.Classes.UniqueIdGenerator;
+
+public class JobItem {
     private Type type;
     private String id, date, reason;
     private double balance;
 
-    public Item() {
+    public JobItem() {
     }
 
-    public Item(String date, String id, Type type, String reason, double balance) {
+    public JobItem(String date, String id, Type type, String reason, double balance) {
         this.date = date;
         this.id = id;
         this.type = type;
         this.reason = reason;
         this.balance = balance;
+    }
+
+    public static JobItem getInstance(String date, Type type, String reason, double balance) {
+        return new JobItem(date, UniqueIdGenerator.generateUniqueId(), type, reason, balance);
     }
 
     public String getDate() {

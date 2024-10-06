@@ -1,11 +1,11 @@
 package com.ali.transaction.Adapters;
 
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,50 +18,50 @@ import com.ali.transaction.Classes.Calculation;
 import com.ali.transaction.Classes.DateAndTime;
 import com.ali.transaction.Classes.DiffCallback;
 import com.ali.transaction.Interfaces.ViewOnClickListener;
-import com.ali.transaction.Models.JobItem;
+import com.ali.transaction.Models.ClientJobModel;
 import com.ali.transaction.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> implements Filterable {
-    static List<JobItem> filteredItems;
+public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.ViewHolder> implements Filterable {
+    static List<ClientJobModel> filteredJobs;
     private final ViewOnClickListener viewOnClickListener;
-    private final List<JobItem> items;
+    private final List<ClientJobModel> jobs;
 
 
-    public ItemsAdapter(List<JobItem> items, ViewOnClickListener viewOnClickListener) {
+    public JobsAdapter(List<ClientJobModel> jobs, ViewOnClickListener viewOnClickListener) {
         this.viewOnClickListener = viewOnClickListener;
-        filteredItems = new ArrayList<>(items);
-        this.items = items;
+        filteredJobs = new ArrayList<>(jobs);
+        this.jobs = jobs;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_row, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.job_row, parent, false);
         return new ViewHolder(view, viewOnClickListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        holder.reason.setText(filteredItems.get(position).getReason());
-        holder.date.setText(DateAndTime.getDate(holder.itemView.getContext(), filteredItems.get(position).getDate()));
-        holder.balance.setText(String.format("%s ج.م", Calculation.formatNumberWithCommas(filteredItems.get(position).getBalance())));
-        if (filteredItems.get(position).getType() == JobItem.Type.TAKE) {
-            holder.imageView.setImageResource(R.drawable.arrow_downward);
+        holder.character.setText(filteredJobs.get(position).getName().substring(0, 1));
+        holder.name.setText(filteredJobs.get(position).getName());
+        holder.date.setText(DateAndTime.getDate(holder.itemView.getContext(), filteredJobs.get(position).getDate()));
+        Pair<String, Boolean> balance = Calculation.getBalance(filteredJobs.get(position).getTake(), filteredJobs.get(position).getGive());
+        holder.balance.setText(String.format("%s ج.م", balance.first));
+        if (balance.second)
             holder.balance.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.green));
-        } else {
-            holder.imageView.setImageResource(R.drawable.arrow_upward);
+        else
             holder.balance.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.red));
-        }
+
         Animation.startAnimation(holder.itemView);
     }
 
     @Override
     public int getItemCount() {
-        return filteredItems.size();
+        return filteredJobs.size();
     }
 
     @Override
@@ -71,13 +71,13 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
             protected FilterResults performFiltering(CharSequence constraint) {
                 String query = constraint.toString().toLowerCase();
 
-                List<JobItem> filteredList = new ArrayList<>();
+                List<ClientJobModel> filteredList = new ArrayList<>();
 
-                for (JobItem item : items) {
-                    if (item.getReason().toLowerCase().contains(query)
-                            || String.valueOf(item.getBalance()).toLowerCase().contains(query)
-                            || item.getDate().toLowerCase().contains(query)) {
-                        filteredList.add(item);
+                for (ClientJobModel job : jobs) {
+                    if (job.getName().toLowerCase().contains(query)
+                            || job.getDate().toLowerCase().contains(query)
+                            || Calculation.getBalance(job.getTake(), job.getGive()).first.toLowerCase().contains(query)) {
+                        filteredList.add(job);
                     }
                 }
 
@@ -91,18 +91,18 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 if (results.values instanceof List) {
                     List<?> resultList = (List<?>) results.values;
-                    if (!resultList.isEmpty() && resultList.get(0) instanceof JobItem) {
-                        @SuppressWarnings("unchecked")
-                        List<JobItem> filteredList = (List<JobItem>) resultList;
+                    if (!resultList.isEmpty() && resultList.get(0) instanceof ClientJobModel) {
+                        @SuppressWarnings("unchecked") List<ClientJobModel> filteredList = (List<ClientJobModel>) resultList;
 
                         // Calculate the differences between the previous and new filtered lists
-                        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(filteredItems, filteredList));
+                        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(filteredJobs, filteredList));
 
-                        filteredItems.clear();
-                        filteredItems.addAll(filteredList);
+                        // Update the filtered jobs list
+                        filteredJobs.clear();
+                        filteredJobs.addAll(filteredList);
 
                         // Dispatch the specific change events to the adapter
-                        diffResult.dispatchUpdatesTo(ItemsAdapter.this);
+                        diffResult.dispatchUpdatesTo(JobsAdapter.this);
                     }
                 }
             }
@@ -111,18 +111,17 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ImageView imageView;
-        public TextView date, reason, balance;
+        public TextView character, date, name, balance;
 
         public ViewHolder(@NonNull View itemView, ViewOnClickListener viewOnClickListener) {
             super(itemView);
 
-            imageView = itemView.findViewById(R.id.type);
+            character = itemView.findViewById(R.id.character);
+            name = itemView.findViewById(R.id.name);
             date = itemView.findViewById(R.id.date);
-            reason = itemView.findViewById(R.id.reason);
             balance = itemView.findViewById(R.id.balance);
 
-            itemView.setOnClickListener(v -> viewOnClickListener.onClickListener(filteredItems.get(getBindingAdapterPosition()).getId()));
+            itemView.setOnClickListener(v -> viewOnClickListener.onClickListener(filteredJobs.get(getBindingAdapterPosition()).getId()));
         }
     }
 }

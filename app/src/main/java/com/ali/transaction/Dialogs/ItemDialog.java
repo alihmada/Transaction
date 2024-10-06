@@ -18,7 +18,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.ali.transaction.Classes.Common;
 import com.ali.transaction.Classes.DateAndTime;
 import com.ali.transaction.Classes.Vibrate;
-import com.ali.transaction.Models.Item;
+import com.ali.transaction.Models.JobItem;
 import com.ali.transaction.R;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -98,7 +98,7 @@ public class ItemDialog extends BottomSheetDialogFragment {
             String price = String.valueOf(this.price.getText());
 
             if (isValidInput(price)) {
-                listener.onDataEntered(takeCheck.isChecked() ? Item.Type.TAKE : Item.Type.GIVE, DateAndTime.getCurrentDateTime(), reason.trim(), Double.parseDouble(price.trim()));
+                listener.onDataEntered(takeCheck.isChecked() ? JobItem.Type.TAKE : JobItem.Type.GIVE, DateAndTime.getCurrentDateTime(), reason.trim(), Double.parseDouble(price.trim()));
                 dismiss();
             } else {
                 handleInputErrors();
@@ -127,6 +127,6 @@ public class ItemDialog extends BottomSheetDialogFragment {
     }
 
     public interface ItemDialogListener {
-        void onDataEntered(Item.Type type, String date, String reason, double price);
+        void onDataEntered(JobItem.Type type, String date, String reason, double price);
     }
 }

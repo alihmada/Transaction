@@ -5,13 +5,13 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.Master.CustomerProfile">
+    tools:context=".Activities.Master.JobProfile">
 
     <TextView
         android:id="@+id/period_head"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/profile_info"
+        android:text="@string/more_info"
         android:textAlignment="center"
         android:textSize="@dimen/text_size"
         android:textStyle="bold"
@@ -45,20 +45,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/back" />
 
-    <TextView
+    <ImageView
         android:id="@+id/character"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_marginTop="30dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/planning"
         android:background="@drawable/text_view_circle"
-        android:gravity="center"
-        android:textSize="60sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/back" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/edit_name_of_customer"
+        android:id="@+id/edit_name_of_job"
         style="@style/focusable_clickable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -75,7 +75,7 @@
             android:layout_height="24dp"
             android:layout_marginEnd="@dimen/margin_for_account"
             android:contentDescription="@string/app_name"
-            android:src="@drawable/person"
+            android:src="@drawable/planning"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -86,13 +86,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_for_account"
             android:layout_marginEnd="@dimen/margin_for_account"
-            android:text="@string/name_of_customer"
+            android:text="@string/job_name"
             android:textSize="@dimen/secondary_text_size"
             app:layout_constraintEnd_toStartOf="@+id/imageView2"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/customer_name"
+            android:id="@+id/job_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_for_account"
@@ -126,7 +126,7 @@
         android:background="@drawable/account_fields"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_name_of_customer">
+        app:layout_constraintTop_toBottomOf="@+id/edit_name_of_job">
 
         <ImageView
             android:id="@+id/imageView3"
@@ -151,7 +151,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/customer_take"
+            android:id="@+id/job_take"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_for_account"
@@ -199,7 +199,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/customer_give"
+            android:id="@+id/job_give"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_for_account"

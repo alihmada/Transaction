@@ -48,5 +48,7 @@
     <string name="exit">هل تريد الخروج؟</string>
     <string name="profile_info">الملف الشخصي</string>
     <string name="name_of_customer">إسم المستخدم</string>
+    <string name="job_name">المهمة</string>
+    <string name="jobs">المهمات</string>
 
 </resources>

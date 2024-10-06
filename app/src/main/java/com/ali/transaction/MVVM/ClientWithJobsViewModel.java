@@ -6,23 +6,24 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.ali.transaction.Models.Customer;
-import com.ali.transaction.Models.Item;
+import com.ali.transaction.Models.Client;
+import com.ali.transaction.Models.ClientJobModel;
+import com.ali.transaction.Models.JobItem;
 
 import java.util.List;
 
-public class CustomerWithItemsViewModel extends ViewModel {
-    private MutableLiveData<Pair<Customer, List<Item>>> mutableLiveData;
+public class ClientWithJobsViewModel extends ViewModel {
+    private MutableLiveData<Pair<Client, List<ClientJobModel>>> mutableLiveData;
 
     public void initialize(String id) {
         if (mutableLiveData != null) {
             return;
         }
         Repository repository = Repository.getInstance();
-        mutableLiveData = repository.getCustomersWithItems(id);
+        mutableLiveData = repository.getClientsWithJobs(id);
     }
 
-    public LiveData<Pair<Customer, List<Item>>> getCustomersWithItems() {
+    public LiveData<Pair<Client, List<ClientJobModel>>> getClientsWithJobs() {
         return mutableLiveData;
     }
 }

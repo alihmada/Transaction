@@ -18,7 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.ali.transaction.Activities.Master.Main;
+import com.ali.transaction.Activities.Master.Clients;
 import com.ali.transaction.Classes.Capture;
 import com.ali.transaction.Classes.Ciphering;
 import com.ali.transaction.Classes.Common;
@@ -190,7 +190,7 @@ public class ID extends AppCompatActivity {
 
     private void navigateToMainScreen() {
         Loading.dismissProgressDialog();
-        Intent intent = new Intent(this, Main.class);
+        Intent intent = new Intent(this, Clients.class);
         startActivity(intent);
         finish();
     }
